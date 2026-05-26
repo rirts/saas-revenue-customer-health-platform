@@ -1,0 +1,12 @@
+saas_revenue_customer_health_platform:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: localhost
+      user: analytics
+      password: analytics_pwd
+      port: 5432
+      dbname: saas_platform
+      schema: analytics
+      threads: 4

@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: raw
+    database: saas_platform
+    schema: raw
+    description: Raw source tables loaded from generated CSV files into PostgreSQL.
+    tables:
+      - name: crm_accounts
+        description: CRM account records representing B2B SaaS customers and prospects.
+      - name: crm_contacts
+        description: CRM contacts linked to accounts.
+      - name: crm_deals
+        description: CRM deal records including pipeline stage, deal amount, expected MRR, and close date.
+      - name: billing_customers
+        description: Billing customer records linked to CRM accounts.
+      - name: billing_subscriptions
+        description: Subscription records with status, plan, MRR, ARR, start date, and cancellation date.
+      - name: billing_invoices
+        description: Invoice records linked to subscriptions and billing customers.
+      - name: billing_payments
+        description: Payment records linked to invoices.
+      - name: product_events
+        description: Product usage events at the account and subscription level.
+      - name: support_tickets
+        description: Support tickets linked to accounts and subscriptions.
