@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Environment variables
+.env
+
+# Data files generated locally
+data/raw/*.csv
+data/generated/*.csv
+
+# dbt
+warehouse/dbt/target/
+warehouse/dbt/dbt_packages/
+warehouse/dbt/logs/
+
+# Airflow
+orchestration/airflow/logs/*
+!orchestration/airflow/logs/.gitkeep
+
+# Local databases
+*.db
+*.duckdb
+*.sqlite
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
