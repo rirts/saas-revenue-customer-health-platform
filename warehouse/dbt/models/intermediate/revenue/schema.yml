@@ -1,0 +1,114 @@
+version: 2
+
+models:
+  - name: int_revenue__invoice_payment_summary
+    description: Invoice-level revenue summary combining invoice status, payment totals, outstanding balance, overdue status, and days to payment.
+    columns:
+      - name: invoice_id
+        description: Unique invoice identifier.
+        tests:
+          - not_null
+          - unique
+
+      - name: subscription_id
+        description: Subscription identifier linked to the invoice.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_billing__subscriptions')
+                field: subscription_id
+
+      - name: account_id
+        description: CRM account identifier linked to the invoice.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_crm__accounts')
+                field: account_id
+
+      - name: amount_due_usd
+        description: Invoice amount due in USD.
+        tests:
+          - not_null
+
+      - name: total_paid_usd
+        description: Total amount paid against the invoice.
+        tests:
+          - not_null
+
+      - name: outstanding_amount_usd
+        description: Remaining unpaid invoice amount.
+        tests:
+          - not_null
+
+      - name: is_fully_paid
+        description: Boolean flag indicating whether invoice has been fully paid.
+        tests:
+          - not_null
+
+      - name: is_overdue
+        description: Boolean flag indicating whether invoice is open and past due.
+        tests:
+          - not_null
+
+  - name: int_revenue__subscriptions_enriched
+    description: Subscription-level revenue model enriched with account attributes, invoice performance, payment behavior, current MRR, and overdue indicators.
+    columns:
+      - name: subscription_id
+        description: Unique subscription identifier.
+        tests:
+          - not_null
+          - unique
+
+      - name: billing_customer_id
+        description: Billing customer identifier linked to the subscription.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_billing__customers')
+                field: billing_customer_id
+
+      - name: account_id
+        description: CRM account identifier linked to the subscription.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_crm__accounts')
+                field: account_id
+
+      - name: subscription_status
+        description: Current subscription status.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['active', 'past_due', 'canceled']
+
+      - name: mrr_usd
+        description: Subscription MRR in USD.
+        tests:
+          - not_null
+
+      - name: arr_usd
+        description: Subscription ARR in USD.
+        tests:
+          - not_null
+
+      - name: current_mrr_usd
+        description: Current active or past-due MRR. Canceled subscriptions contribute zero.
+        tests:
+          - not_null
+
+      - name: collection_rate
+        description: Ratio of total paid amount to total invoiced amount.
+        tests:
+          - not_null
+
+      - name: has_overdue_invoice
+        description: Boolean flag indicating whether the subscription has at least one overdue invoice.
+        tests:
+          - not_null

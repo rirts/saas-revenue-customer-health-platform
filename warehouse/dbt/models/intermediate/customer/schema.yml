@@ -1,0 +1,47 @@
+version: 2
+
+models:
+  - name: int_customer__account_base
+    description: Account-level customer base combining CRM, contacts, deals, billing customer, and subscription lifecycle information.
+    columns:
+      - name: account_id
+        description: Unique account identifier.
+        tests:
+          - not_null
+          - unique
+
+      - name: account_name
+        description: Account or company name.
+        tests:
+          - not_null
+
+      - name: segment
+        description: Customer segment.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['SMB', 'Mid-Market', 'Enterprise']
+
+      - name: account_lifecycle_stage
+        description: Account lifecycle stage derived from CRM and subscription status.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - active_customer
+                  - past_due_customer
+                  - churned_customer
+                  - won_not_subscribed
+                  - prospect
+
+      - name: current_mrr_usd
+        description: Current active or past-due MRR associated with the account.
+        tests:
+          - not_null
+
+      - name: current_arr_usd
+        description: Current active or past-due ARR associated with the account.
+        tests:
+          - not_null
