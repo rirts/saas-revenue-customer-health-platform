@@ -1,0 +1,185 @@
+version: 2
+
+models:
+  - name: stg_billing__customers
+    description: Cleaned billing customer records linked to CRM accounts.
+    columns:
+      - name: billing_customer_id
+        description: Unique billing customer identifier.
+        tests:
+          - not_null
+          - unique
+      - name: account_id
+        description: CRM account identifier linked to the billing customer.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_crm__accounts')
+                field: account_id
+      - name: customer_name
+        description: Billing customer name.
+        tests:
+          - not_null
+      - name: created_at
+        description: Date when the billing customer was created.
+        tests:
+          - not_null
+
+  - name: stg_billing__subscriptions
+    description: Cleaned subscription records with plan, status, billing cycle, MRR, ARR, and lifecycle dates.
+    columns:
+      - name: subscription_id
+        description: Unique subscription identifier.
+        tests:
+          - not_null
+          - unique
+      - name: billing_customer_id
+        description: Billing customer identifier linked to the subscription.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_billing__customers')
+                field: billing_customer_id
+      - name: account_id
+        description: CRM account identifier linked to the subscription.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_crm__accounts')
+                field: account_id
+      - name: plan
+        description: Subscription plan.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Starter', 'Growth', 'Scale', 'Enterprise']
+      - name: subscription_status
+        description: Current subscription status.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['active', 'past_due', 'canceled']
+      - name: billing_cycle
+        description: Subscription billing cycle.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['monthly', 'annual']
+      - name: mrr_usd
+        description: Monthly recurring revenue in USD.
+        tests:
+          - not_null
+      - name: arr_usd
+        description: Annual recurring revenue in USD.
+        tests:
+          - not_null
+      - name: start_date
+        description: Subscription start date.
+        tests:
+          - not_null
+
+  - name: stg_billing__invoices
+    description: Cleaned billing invoices linked to subscriptions and billing customers.
+    columns:
+      - name: invoice_id
+        description: Unique invoice identifier.
+        tests:
+          - not_null
+          - unique
+      - name: subscription_id
+        description: Subscription identifier linked to the invoice.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_billing__subscriptions')
+                field: subscription_id
+      - name: billing_customer_id
+        description: Billing customer identifier linked to the invoice.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_billing__customers')
+                field: billing_customer_id
+      - name: account_id
+        description: CRM account identifier linked to the invoice.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_crm__accounts')
+                field: account_id
+      - name: invoice_date
+        description: Invoice issue date.
+        tests:
+          - not_null
+      - name: due_date
+        description: Invoice due date.
+        tests:
+          - not_null
+      - name: amount_due_usd
+        description: Invoice amount due in USD.
+        tests:
+          - not_null
+      - name: invoice_status
+        description: Invoice status.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['paid', 'open']
+
+  - name: stg_billing__payments
+    description: Cleaned payment records linked to invoices and billing customers.
+    columns:
+      - name: payment_id
+        description: Unique payment identifier.
+        tests:
+          - not_null
+          - unique
+      - name: invoice_id
+        description: Invoice identifier linked to the payment.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_billing__invoices')
+                field: invoice_id
+      - name: billing_customer_id
+        description: Billing customer identifier linked to the payment.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_billing__customers')
+                field: billing_customer_id
+      - name: account_id
+        description: CRM account identifier linked to the payment.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_crm__accounts')
+                field: account_id
+      - name: payment_date
+        description: Payment date.
+        tests:
+          - not_null
+      - name: amount_paid_usd
+        description: Amount paid in USD.
+        tests:
+          - not_null
+      - name: payment_method
+        description: Payment method.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['card', 'bank_transfer', 'wire']
