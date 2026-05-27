@@ -16,6 +16,7 @@ data/generated/*.csv
 warehouse/dbt/target/
 warehouse/dbt/dbt_packages/
 warehouse/dbt/logs/
+warehouse/dbt/.user.yml
 
 # Airflow
 orchestration/airflow/logs/*
