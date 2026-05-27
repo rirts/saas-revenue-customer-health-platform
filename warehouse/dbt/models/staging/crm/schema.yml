@@ -1,0 +1,91 @@
+version: 2
+
+models:
+  - name: stg_crm__accounts
+    description: Cleaned CRM account records representing B2B SaaS customers and prospects.
+    columns:
+      - name: account_id
+        description: Unique account identifier.
+        tests:
+          - not_null
+          - unique
+      - name: account_name
+        description: Account or company name.
+        tests:
+          - not_null
+      - name: industry
+        description: Account industry.
+        tests:
+          - not_null
+      - name: segment
+        description: Customer segment.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['SMB', 'Mid-Market', 'Enterprise']
+      - name: created_at
+        description: Date when the account was created.
+        tests:
+          - not_null
+
+  - name: stg_crm__contacts
+    description: Cleaned CRM contact records linked to accounts.
+    columns:
+      - name: contact_id
+        description: Unique contact identifier.
+        tests:
+          - not_null
+          - unique
+      - name: account_id
+        description: Account identifier linked to the contact.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_crm__accounts')
+                field: account_id
+      - name: email
+        description: Contact email address.
+        tests:
+          - not_null
+      - name: contact_role
+        description: Contact role within the account.
+        tests:
+          - not_null
+
+  - name: stg_crm__deals
+    description: Cleaned CRM deal records used for pipeline and bookings analytics.
+    columns:
+      - name: deal_id
+        description: Unique deal identifier.
+        tests:
+          - not_null
+          - unique
+      - name: account_id
+        description: Account identifier linked to the deal.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_crm__accounts')
+                field: account_id
+      - name: deal_stage
+        description: Current stage of the deal.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['prospecting', 'qualified', 'proposal', 'negotiation', 'closed_won', 'closed_lost']
+      - name: deal_amount_usd
+        description: Total deal amount in USD.
+        tests:
+          - not_null
+      - name: expected_mrr_usd
+        description: Expected monthly recurring revenue from the deal.
+        tests:
+          - not_null
+      - name: created_at
+        description: Date when the deal was created.
+        tests:
+          - not_null
