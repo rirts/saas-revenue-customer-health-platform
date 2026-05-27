@@ -1,0 +1,58 @@
+version: 2
+
+models:
+  - name: stg_product__events
+    description: Cleaned product usage events at the account and subscription level.
+    columns:
+      - name: event_id
+        description: Unique product event identifier.
+        tests:
+          - not_null
+          - unique
+
+      - name: account_id
+        description: CRM account identifier linked to the product event.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_crm__accounts')
+                field: account_id
+
+      - name: subscription_id
+        description: Subscription identifier linked to the product event.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_billing__subscriptions')
+                field: subscription_id
+
+      - name: user_id
+        description: Synthetic product user identifier.
+        tests:
+          - not_null
+
+      - name: event_type
+        description: Type of product event.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - login
+                  - dashboard_viewed
+                  - report_created
+                  - integration_connected
+                  - user_invited
+                  - export_downloaded
+
+      - name: occurred_at
+        description: Timestamp when the event occurred.
+        tests:
+          - not_null
+
+      - name: event_date
+        description: Date when the event occurred.
+        tests:
+          - not_null

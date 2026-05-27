@@ -1,0 +1,92 @@
+version: 2
+
+models:
+  - name: stg_support__tickets
+    description: Cleaned support tickets linked to accounts and subscriptions.
+    columns:
+      - name: ticket_id
+        description: Unique support ticket identifier.
+        tests:
+          - not_null
+          - unique
+
+      - name: account_id
+        description: CRM account identifier linked to the support ticket.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_crm__accounts')
+                field: account_id
+
+      - name: subscription_id
+        description: Subscription identifier linked to the support ticket.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_billing__subscriptions')
+                field: subscription_id
+
+      - name: created_at
+        description: Timestamp when the ticket was created.
+        tests:
+          - not_null
+
+      - name: created_date
+        description: Date when the ticket was created.
+        tests:
+          - not_null
+
+      - name: ticket_status
+        description: Current ticket status.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - open
+                  - pending
+                  - resolved
+                  - closed
+
+      - name: severity
+        description: Ticket severity level.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - low
+                  - medium
+                  - high
+                  - critical
+
+      - name: category
+        description: Ticket category.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - billing
+                  - bug
+                  - how_to
+                  - integration
+                  - performance
+                  - feature_request
+
+      - name: is_resolved
+        description: Boolean flag indicating whether the ticket is resolved or closed.
+        tests:
+          - not_null
+
+      - name: is_open
+        description: Boolean flag indicating whether the ticket is open or pending.
+        tests:
+          - not_null
+
+      - name: is_high_priority
+        description: Boolean flag indicating whether the ticket is high or critical severity.
+        tests:
+          - not_null
