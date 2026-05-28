@@ -1,0 +1,63 @@
+version: 2
+
+models:
+  - name: mart_customer_health
+    description: Customer health mart for executive reporting and customer success prioritization.
+    columns:
+      - name: account_id
+        description: Unique account identifier.
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('int_customer__health_signals')
+                field: account_id
+
+      - name: account_name
+        description: Account name.
+        tests:
+          - not_null
+
+      - name: customer_health_segment
+        description: Business-ready customer health segment.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['healthy', 'watch', 'at_risk', 'critical', 'not_customer']
+
+      - name: is_current_customer
+        description: Boolean flag indicating whether the account currently has active or past-due MRR.
+        tests:
+          - not_null
+
+      - name: is_churn_risk
+        description: Boolean flag indicating whether the account has churn-risk signals.
+        tests:
+          - not_null
+
+      - name: customer_health_score
+        description: Risk-adjusted customer health score.
+        tests:
+          - not_null
+
+      - name: raw_customer_health_score
+        description: Customer health score before business risk caps.
+        tests:
+          - not_null
+
+      - name: current_mrr_usd
+        description: Current recurring revenue associated with the account.
+        tests:
+          - not_null
+
+      - name: recommended_action
+        description: Recommended customer success action based on health segment.
+        tests:
+          - not_null
+
+      - name: health_priority_rank
+        description: Numeric rank used for operational prioritization.
+        tests:
+          - not_null
