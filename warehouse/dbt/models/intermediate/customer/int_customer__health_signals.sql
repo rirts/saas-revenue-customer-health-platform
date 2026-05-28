@@ -54,7 +54,7 @@ subscription_aggregated as (
 
 ),
 
-final as (
+signals as (
 
     select
         account_base.account_id,
@@ -108,41 +108,12 @@ final as (
         coalesce(support_summary.has_critical_ticket, false) as has_critical_ticket,
 
         case
-            when coalesce(product_usage.total_events, 0) >= 500 then 30
-            when coalesce(product_usage.total_events, 0) >= 150 then 22
-            when coalesce(product_usage.total_events, 0) > 0 then 12
-            else 0
-        end as usage_score,
-
-        case
-            when coalesce(product_usage.adopted_feature_count, 0) >= 5 then 20
-            when coalesce(product_usage.adopted_feature_count, 0) >= 3 then 14
-            when coalesce(product_usage.adopted_feature_count, 0) >= 1 then 7
-            else 0
-        end as adoption_score,
-
-        case
-            when coalesce(subscription_aggregated.has_overdue_invoice, false) then 0
-            when coalesce(subscription_aggregated.avg_collection_rate, 0) >= 0.98 then 20
-            when coalesce(subscription_aggregated.avg_collection_rate, 0) >= 0.90 then 14
-            when coalesce(subscription_aggregated.avg_collection_rate, 0) > 0 then 7
-            else 0
-        end as payment_score,
-
-        case
-            when coalesce(support_summary.has_critical_ticket, false) then 0
-            when coalesce(support_summary.high_priority_tickets, 0) >= 3 then 4
-            when coalesce(support_summary.open_tickets, 0) >= 3 then 7
-            when coalesce(support_summary.total_tickets, 0) >= 8 then 10
-            else 15
-        end as support_score,
-
-        case
-            when account_base.executive_sponsor_count > 0 and account_base.admin_contact_count > 0 then 15
-            when account_base.executive_sponsor_count > 0 or account_base.admin_contact_count > 0 then 10
-            when account_base.contact_count > 0 then 5
-            else 0
-        end as relationship_score
+            when coalesce(subscription_aggregated.current_mrr_usd, 0) > 0
+                or coalesce(subscription_aggregated.active_subscription_count, 0) > 0
+                or coalesce(subscription_aggregated.past_due_subscription_count, 0) > 0
+                then true
+            else false
+        end as is_current_customer
 
     from account_base
     left join subscription_aggregated
@@ -154,7 +125,88 @@ final as (
 
 ),
 
-scored as (
+risk_flags as (
+
+    select
+        *,
+
+        case
+            when is_current_customer
+                and usage_intensity in ('no_usage', 'low_usage')
+                then true
+            else false
+        end as low_usage_paid_account,
+
+        case
+            when has_overdue_invoice then true
+            when past_due_subscription_count > 0 then true
+            when total_invoiced_usd > 0 and avg_collection_rate < 0.90 then true
+            else false
+        end as payment_risk_flag,
+
+        case
+            when has_critical_ticket then true
+            when high_priority_tickets >= 3 then true
+            when open_tickets >= 3 then true
+            else false
+        end as support_risk_flag
+
+    from signals
+
+),
+
+component_scores as (
+
+    select
+        *,
+
+        case
+            when usage_intensity = 'high_usage' then 35
+            when usage_intensity = 'medium_usage' then 25
+            when usage_intensity = 'low_usage' then 8
+            else 0
+        end as usage_score,
+
+        case
+            when adopted_feature_count >= 5 then 20
+            when adopted_feature_count >= 3 then 12
+            when adopted_feature_count >= 1 then 5
+            else 0
+        end as adoption_score,
+
+        case
+            when not is_current_customer then 0
+            when has_overdue_invoice then 0
+            when past_due_subscription_count > 0 then 5
+            when total_invoiced_usd = 0 then 18
+            when avg_collection_rate >= 0.98 then 25
+            when avg_collection_rate >= 0.90 then 18
+            when avg_collection_rate >= 0.75 then 10
+            when avg_collection_rate > 0 then 5
+            else 0
+        end as payment_score,
+
+        case
+            when has_critical_ticket then 0
+            when high_priority_tickets >= 3 then 3
+            when open_tickets >= 3 then 6
+            when support_burden_level = 'high_burden' then 8
+            when support_burden_level = 'medium_burden' then 11
+            else 15
+        end as support_score,
+
+        case
+            when executive_sponsor_count > 0 and admin_contact_count > 0 then 5
+            when executive_sponsor_count > 0 or admin_contact_count > 0 then 3
+            when contact_count > 0 then 1
+            else 0
+        end as relationship_score
+
+    from risk_flags
+
+),
+
+raw_scored as (
 
     select
         *,
@@ -165,44 +217,81 @@ scored as (
             + payment_score
             + support_score
             + relationship_score
-        ) as customer_health_score,
+        ) as raw_customer_health_score
+
+    from component_scores
+
+),
+
+risk_adjusted as (
+
+    select
+        *,
 
         case
-            when (
-                usage_score
-                + adoption_score
-                + payment_score
-                + support_score
-                + relationship_score
-            ) >= 75 then 'healthy'
-            when (
-                usage_score
-                + adoption_score
-                + payment_score
-                + support_score
-                + relationship_score
-            ) >= 50 then 'watch'
-            when (
-                usage_score
-                + adoption_score
-                + payment_score
-                + support_score
-                + relationship_score
-            ) >= 25 then 'at_risk'
+            when not is_current_customer
+                and account_lifecycle_stage in ('prospect', 'won_not_subscribed')
+                then raw_customer_health_score
+
+            when account_lifecycle_stage = 'churned_customer'
+                then least(raw_customer_health_score, 20)
+
+            when has_critical_ticket or has_overdue_invoice
+                then least(raw_customer_health_score, 49)
+
+            when payment_risk_flag or support_risk_flag or low_usage_paid_account
+                then least(raw_customer_health_score, 64)
+
+            else raw_customer_health_score
+        end as customer_health_score
+
+    from raw_scored
+
+),
+
+segmented as (
+
+    select
+        *,
+
+        case
+            when not is_current_customer
+                and account_lifecycle_stage in ('prospect', 'won_not_subscribed')
+                then 'not_customer'
+
+            when account_lifecycle_stage = 'churned_customer'
+                then 'critical'
+
+            when customer_health_score >= 80
+                then 'healthy'
+
+            when customer_health_score >= 60
+                then 'watch'
+
+            when customer_health_score >= 35
+                then 'at_risk'
+
             else 'critical'
         end as customer_health_segment,
 
         case
-            when account_lifecycle_stage = 'churned_customer' then true
-            when has_overdue_invoice then true
-            when has_critical_ticket then true
-            when usage_intensity in ('no_usage', 'low_usage') and current_mrr_usd > 0 then true
+            when not is_current_customer
+                and account_lifecycle_stage in ('prospect', 'won_not_subscribed')
+                then false
+
+            when account_lifecycle_stage = 'churned_customer'
+                then true
+
+            when payment_risk_flag then true
+            when support_risk_flag then true
+            when low_usage_paid_account then true
+
             else false
         end as is_churn_risk
 
-    from final
+    from risk_adjusted
 
 )
 
 select *
-from scored
+from segmented

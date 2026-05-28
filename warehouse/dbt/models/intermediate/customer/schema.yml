@@ -100,14 +100,39 @@ models:
           - not_null
 
       - name: customer_health_segment
-        description: Customer health segment derived from the health score.
+        description: Customer health segment derived from the risk-adjusted health score.
         tests:
           - not_null
           - accepted_values:
               arguments:
-                values: ['healthy', 'watch', 'at_risk', 'critical']
+                values: ['healthy', 'watch', 'at_risk', 'critical', 'not_customer']
 
       - name: is_churn_risk
         description: Boolean flag indicating whether the account shows churn-risk signals.
+        tests:
+          - not_null
+      
+      - name: is_current_customer
+        description: Boolean flag indicating whether the account has active or past-due recurring revenue.
+        tests:
+          - not_null
+
+      - name: low_usage_paid_account
+        description: Boolean flag indicating whether a paying account has low or no product usage.
+        tests:
+          - not_null
+
+      - name: payment_risk_flag
+        description: Boolean flag indicating payment-related churn risk.
+        tests:
+          - not_null
+
+      - name: support_risk_flag
+        description: Boolean flag indicating support-related churn risk.
+        tests:
+          - not_null
+
+      - name: raw_customer_health_score
+        description: Customer health score before business risk caps.
         tests:
           - not_null
