@@ -45,3 +45,69 @@ models:
         description: Current active or past-due ARR associated with the account.
         tests:
           - not_null
+          
+  - name: int_customer__health_signals
+    description: Account-level customer health signal model combining revenue, product usage, support burden, and relationship strength.
+    columns:
+      - name: account_id
+        description: Unique account identifier.
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('int_customer__account_base')
+                field: account_id
+
+      - name: account_lifecycle_stage
+        description: Account lifecycle stage from the account base model.
+        tests:
+          - not_null
+
+      - name: current_mrr_usd
+        description: Current MRR associated with the account.
+        tests:
+          - not_null
+
+      - name: usage_score
+        description: Health score component based on product usage volume.
+        tests:
+          - not_null
+
+      - name: adoption_score
+        description: Health score component based on feature adoption.
+        tests:
+          - not_null
+
+      - name: payment_score
+        description: Health score component based on collection and overdue invoices.
+        tests:
+          - not_null
+
+      - name: support_score
+        description: Health score component based on support burden.
+        tests:
+          - not_null
+
+      - name: relationship_score
+        description: Health score component based on contact coverage.
+        tests:
+          - not_null
+
+      - name: customer_health_score
+        description: Total customer health score from 0 to 100.
+        tests:
+          - not_null
+
+      - name: customer_health_segment
+        description: Customer health segment derived from the health score.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['healthy', 'watch', 'at_risk', 'critical']
+
+      - name: is_churn_risk
+        description: Boolean flag indicating whether the account shows churn-risk signals.
+        tests:
+          - not_null

@@ -1,0 +1,53 @@
+version: 2
+
+models:
+  - name: int_support__account_ticket_summary
+    description: Account-level support burden summary based on ticket volume, severity, status, and resolution time.
+    columns:
+      - name: account_id
+        description: Unique account identifier.
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('stg_crm__accounts')
+                field: account_id
+
+      - name: total_tickets
+        description: Total support tickets for the account.
+        tests:
+          - not_null
+
+      - name: open_tickets
+        description: Open or pending tickets for the account.
+        tests:
+          - not_null
+
+      - name: resolved_tickets
+        description: Resolved or closed tickets for the account.
+        tests:
+          - not_null
+
+      - name: high_priority_tickets
+        description: Tickets with high or critical severity.
+        tests:
+          - not_null
+
+      - name: support_burden_level
+        description: Support burden level derived from ticket count and priority.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['high_burden', 'medium_burden', 'low_burden', 'no_burden']
+
+      - name: has_open_tickets
+        description: Boolean flag indicating whether the account has open or pending tickets.
+        tests:
+          - not_null
+
+      - name: has_critical_ticket
+        description: Boolean flag indicating whether the account has at least one critical ticket.
+        tests:
+          - not_null

@@ -1,0 +1,53 @@
+version: 2
+
+models:
+  - name: int_product__account_usage
+    description: Account-level product usage summary based on product events.
+    columns:
+      - name: account_id
+        description: Unique account identifier.
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('stg_crm__accounts')
+                field: account_id
+
+      - name: total_events
+        description: Total product events recorded for the account.
+        tests:
+          - not_null
+
+      - name: active_users
+        description: Number of distinct synthetic users active in the account.
+        tests:
+          - not_null
+
+      - name: active_days
+        description: Number of distinct days with product activity.
+        tests:
+          - not_null
+
+      - name: adopted_feature_count
+        description: Number of distinct product event types used by the account.
+        tests:
+          - not_null
+
+      - name: usage_intensity
+        description: Usage intensity bucket based on total event volume.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['high_usage', 'medium_usage', 'low_usage', 'no_usage']
+
+      - name: has_connected_integration
+        description: Boolean flag indicating whether the account connected an integration.
+        tests:
+          - not_null
+
+      - name: has_created_report
+        description: Boolean flag indicating whether the account created at least one report.
+        tests:
+          - not_null
