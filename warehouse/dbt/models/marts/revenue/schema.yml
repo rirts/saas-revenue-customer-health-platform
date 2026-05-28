@@ -1,0 +1,66 @@
+version: 2
+
+models:
+  - name: mart_revenue_retention
+    description: Revenue retention mart summarizing current MRR, MRR at risk, healthy MRR, and customer risk rates by health segment, revenue tier, and operational action.
+    columns:
+      - name: customer_health_segment
+        description: Business-ready customer health segment.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['healthy', 'watch', 'at_risk', 'critical']
+
+      - name: revenue_tier
+        description: Revenue tier based on current MRR.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['high_value', 'mid_value', 'low_value']
+
+      - name: account_priority_action
+        description: Recommended account-level operational action.
+        tests:
+          - not_null
+
+      - name: customer_count
+        description: Number of current customers in the segment.
+        tests:
+          - not_null
+
+      - name: churn_risk_customer_count
+        description: Number of current customers with churn-risk signals.
+        tests:
+          - not_null
+
+      - name: current_mrr_usd
+        description: Current MRR in the segment.
+        tests:
+          - not_null
+
+      - name: mrr_at_risk_usd
+        description: MRR associated with churn-risk customers.
+        tests:
+          - not_null
+
+      - name: healthy_mrr_usd
+        description: MRR associated with healthy customers.
+        tests:
+          - not_null
+
+      - name: non_healthy_mrr_usd
+        description: MRR associated with watch, at-risk, or critical customers.
+        tests:
+          - not_null
+
+      - name: mrr_at_risk_rate
+        description: Share of current MRR at risk.
+        tests:
+          - not_null
+
+      - name: customer_risk_rate
+        description: Share of customers with churn-risk signals.
+        tests:
+          - not_null
