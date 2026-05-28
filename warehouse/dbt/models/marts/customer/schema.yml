@@ -61,3 +61,79 @@ models:
         description: Numeric rank used for operational prioritization.
         tests:
           - not_null
+  - name: mart_account_360
+    description: Account 360 mart with customer lifecycle, revenue, health, product usage, support burden, and operational prioritization fields.
+    columns:
+      - name: account_id
+        description: Unique account identifier.
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('mart_customer_health')
+                field: account_id
+
+      - name: account_name
+        description: Account name.
+        tests:
+          - not_null
+
+      - name: account_status_group
+        description: Executive-friendly lifecycle grouping.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Customer', 'Won - Not Subscribed', 'Prospect', 'Churned Customer', 'Other']
+
+      - name: customer_health_segment
+        description: Business-ready customer health segment.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['healthy', 'watch', 'at_risk', 'critical', 'not_customer']
+
+      - name: revenue_tier
+        description: Revenue tier based on current MRR.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['high_value', 'mid_value', 'low_value', 'non_customer', 'unknown']
+
+      - name: account_priority_action
+        description: Operational action recommended for the account.
+        tests:
+          - not_null
+
+      - name: current_mrr_usd
+        description: Current recurring revenue associated with the account.
+        tests:
+          - not_null
+
+      - name: mrr_at_risk_usd
+        description: Current MRR associated with churn-risk accounts.
+        tests:
+          - not_null
+
+      - name: healthy_mrr_usd
+        description: Current MRR associated with healthy customers.
+        tests:
+          - not_null
+
+      - name: non_healthy_mrr_usd
+        description: Current MRR associated with watch, at-risk, and critical customers.
+        tests:
+          - not_null
+
+      - name: is_current_customer
+        description: Boolean flag indicating whether the account currently has active or past-due MRR.
+        tests:
+          - not_null
+
+      - name: is_churn_risk
+        description: Boolean flag indicating whether the account has churn-risk signals.
+        tests:
+          - not_null
