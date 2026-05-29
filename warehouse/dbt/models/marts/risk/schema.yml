@@ -1,0 +1,71 @@
+version: 2
+
+models:
+  - name: mart_churn_risk
+    description: Account-level churn risk mart for operational prioritization, risk reason classification, and customer success playbooks.
+    columns:
+      - name: account_id
+        description: Unique account identifier.
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('mart_account_360')
+                field: account_id
+
+      - name: account_name
+        description: Account name.
+        tests:
+          - not_null
+
+      - name: customer_health_segment
+        description: Customer health segment for the risk account.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['watch', 'at_risk', 'critical']
+
+      - name: current_mrr_usd
+        description: Current MRR associated with the account.
+        tests:
+          - not_null
+
+      - name: mrr_at_risk_usd
+        description: Current MRR exposed to churn risk.
+        tests:
+          - not_null
+
+      - name: primary_risk_reason
+        description: Main reason the account is classified as churn risk.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - churned_customer
+                  - overdue_invoice
+                  - critical_support_ticket
+                  - payment_risk
+                  - support_risk
+                  - low_product_usage
+                  - general_risk
+
+      - name: recommended_risk_playbook
+        description: Recommended operational playbook for the risk account.
+        tests:
+          - not_null
+
+      - name: risk_priority
+        description: Human-readable churn risk priority.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['P1', 'P2', 'P3', 'P4', 'P5']
+
+      - name: risk_priority_rank
+        description: Numeric priority rank for sorting churn risk accounts.
+        tests:
+          - not_null
