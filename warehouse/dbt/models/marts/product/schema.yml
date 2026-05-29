@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: mart_product_adoption
-    description: Product adoption mart summarizing usage, feature adoption, integration adoption, and low-usage risk by customer health segment and revenue tier.
+    description: "{{ doc('mart_product_adoption_overview') }}"
     columns:
       - name: customer_health_segment
         description: Business-ready customer health segment.

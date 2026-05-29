@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: mart_customer_health
-    description: Customer health mart for executive reporting and customer success prioritization.
+    description: "{{ doc('mart_customer_health_overview') }}"
     columns:
       - name: account_id
         description: Unique account identifier.
@@ -62,7 +62,7 @@ models:
         tests:
           - not_null
   - name: mart_account_360
-    description: Account 360 mart with customer lifecycle, revenue, health, product usage, support burden, and operational prioritization fields.
+    description: "{{ doc('mart_account_360_overview') }}"
     columns:
       - name: account_id
         description: Unique account identifier.

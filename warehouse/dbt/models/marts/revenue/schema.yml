@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: mart_revenue_retention
-    description: Revenue retention mart summarizing current MRR, MRR at risk, healthy MRR, and customer risk rates by health segment, revenue tier, and operational action.
+    description: "{{ doc('mart_revenue_retention_overview') }}"
     columns:
       - name: customer_health_segment
         description: Business-ready customer health segment.

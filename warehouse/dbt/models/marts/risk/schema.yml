@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: mart_churn_risk
-    description: Account-level churn risk mart for operational prioritization, risk reason classification, and customer success playbooks.
+    description: "{{ doc('mart_churn_risk_overview') }}"
     columns:
       - name: account_id
         description: Unique account identifier.

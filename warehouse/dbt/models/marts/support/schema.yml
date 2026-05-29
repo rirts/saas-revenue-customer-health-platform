@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: mart_support_operations
-    description: Support operations mart summarizing support burden, ticket volume, critical tickets, open tickets, and MRR at risk by customer health segment and revenue tier.
+    description: "{{ doc('mart_support_operations_overview') }}"
     columns:
       - name: customer_health_segment
         description: Business-ready customer health segment.
