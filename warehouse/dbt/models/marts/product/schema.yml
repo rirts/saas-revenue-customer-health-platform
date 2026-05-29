@@ -1,0 +1,74 @@
+version: 2
+
+models:
+  - name: mart_product_adoption
+    description: Product adoption mart summarizing usage, feature adoption, integration adoption, and low-usage risk by customer health segment and revenue tier.
+    columns:
+      - name: customer_health_segment
+        description: Business-ready customer health segment.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['healthy', 'watch', 'at_risk', 'critical']
+
+      - name: revenue_tier
+        description: Revenue tier based on current MRR.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['high_value', 'mid_value', 'low_value']
+
+      - name: usage_intensity
+        description: Product usage intensity bucket.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['high_usage', 'medium_usage', 'low_usage', 'no_usage']
+
+      - name: customer_count
+        description: Number of current customers in the segment.
+        tests:
+          - not_null
+
+      - name: churn_risk_customer_count
+        description: Number of customers with churn-risk signals.
+        tests:
+          - not_null
+
+      - name: current_mrr_usd
+        description: Current MRR in the segment.
+        tests:
+          - not_null
+
+      - name: mrr_at_risk_usd
+        description: MRR associated with churn-risk customers.
+        tests:
+          - not_null
+
+      - name: avg_events_per_account
+        description: Average product events per customer account.
+        tests:
+          - not_null
+
+      - name: avg_adopted_feature_count
+        description: Average number of adopted product features.
+        tests:
+          - not_null
+
+      - name: integration_adoption_rate
+        description: Share of accounts with at least one connected integration.
+        tests:
+          - not_null
+
+      - name: report_creation_rate
+        description: Share of accounts with at least one created report.
+        tests:
+          - not_null
+
+      - name: low_usage_paid_account_rate
+        description: Share of paying accounts with low product usage.
+        tests:
+          - not_null
