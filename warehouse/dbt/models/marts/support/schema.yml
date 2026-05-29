@@ -1,0 +1,89 @@
+version: 2
+
+models:
+  - name: mart_support_operations
+    description: Support operations mart summarizing support burden, ticket volume, critical tickets, open tickets, and MRR at risk by customer health segment and revenue tier.
+    columns:
+      - name: customer_health_segment
+        description: Business-ready customer health segment.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['healthy', 'watch', 'at_risk', 'critical']
+
+      - name: revenue_tier
+        description: Revenue tier based on current MRR.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['high_value', 'mid_value', 'low_value']
+
+      - name: support_burden_level
+        description: Support burden level based on ticket volume and priority.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['high_burden', 'medium_burden', 'low_burden', 'no_burden']
+
+      - name: customer_count
+        description: Number of current customers in the segment.
+        tests:
+          - not_null
+
+      - name: churn_risk_customer_count
+        description: Number of customers with churn-risk signals.
+        tests:
+          - not_null
+
+      - name: current_mrr_usd
+        description: Current MRR in the segment.
+        tests:
+          - not_null
+
+      - name: mrr_at_risk_usd
+        description: MRR associated with churn-risk customers.
+        tests:
+          - not_null
+
+      - name: total_tickets
+        description: Total tickets in the segment.
+        tests:
+          - not_null
+
+      - name: open_tickets
+        description: Total open tickets in the segment.
+        tests:
+          - not_null
+
+      - name: high_priority_tickets
+        description: Total high-priority tickets in the segment.
+        tests:
+          - not_null
+
+      - name: critical_tickets
+        description: Total critical tickets in the segment.
+        tests:
+          - not_null
+
+      - name: support_risk_accounts
+        description: Number of accounts with support-related risk signals.
+        tests:
+          - not_null
+
+      - name: open_ticket_account_rate
+        description: Share of accounts with at least one open ticket.
+        tests:
+          - not_null
+
+      - name: critical_ticket_account_rate
+        description: Share of accounts with at least one critical ticket.
+        tests:
+          - not_null
+
+      - name: support_risk_account_rate
+        description: Share of accounts with support-risk signals.
+        tests:
+          - not_null
