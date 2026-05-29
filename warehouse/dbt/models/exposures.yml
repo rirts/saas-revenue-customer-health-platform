@@ -1,0 +1,81 @@
+version: 2
+
+exposures:
+  - name: executive_customer_health_dashboard
+    label: Executive Customer Health Dashboard
+    type: dashboard
+    maturity: high
+    url: http://localhost:3000
+    description: >
+      Executive dashboard for monitoring customer health, MRR at risk,
+      churn risk drivers, product adoption, support burden, and account-level
+      prioritization across the SaaS customer base.
+
+    depends_on:
+      - ref('mart_account_360')
+      - ref('mart_customer_health')
+      - ref('mart_revenue_retention')
+      - ref('mart_churn_risk')
+      - ref('mart_product_adoption')
+      - ref('mart_support_operations')
+
+    owner:
+      name: Rafael Ruiz
+      email: rafartejadasegura@gmail.com
+
+  - name: customer_success_risk_queue
+    label: Customer Success Risk Queue
+    type: dashboard
+    maturity: medium
+    url: http://localhost:3000
+    description: >
+      Operational dashboard for Customer Success teams to prioritize churn-risk
+      accounts by risk reason, playbook, MRR exposure, support signals,
+      payment issues, and product usage patterns.
+
+    depends_on:
+      - ref('mart_churn_risk')
+      - ref('mart_account_360')
+      - ref('mart_customer_health')
+
+    owner:
+      name: Rafael Ruiz
+      email: rafartejadasegura@gmail.com
+
+  - name: product_adoption_and_retention_dashboard
+    label: Product Adoption and Retention Dashboard
+    type: dashboard
+    maturity: medium
+    url: http://localhost:3000
+    description: >
+      Product and revenue retention dashboard used to analyze how product usage,
+      feature adoption, integrations, and report creation relate to customer
+      health and MRR at risk.
+
+    depends_on:
+      - ref('mart_product_adoption')
+      - ref('mart_revenue_retention')
+      - ref('mart_account_360')
+
+    owner:
+      name: Rafael Ruiz
+      email: rafartejadasegura@gmail.com
+
+  - name: support_operations_dashboard
+    label: Support Operations Dashboard
+    type: dashboard
+    maturity: medium
+    url: http://localhost:3000
+    description: >
+      Support operations dashboard for analyzing ticket burden, open tickets,
+      critical tickets, support-related churn risk, and MRR exposure by customer
+      health segment and revenue tier.
+
+    depends_on:
+      - ref('mart_support_operations')
+      - ref('mart_churn_risk')
+      - ref('mart_account_360')
+
+    owner:
+      name: Rafael Ruiz
+      email: rafartejadasegura@gmail.com
