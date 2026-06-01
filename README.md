@@ -39,6 +39,8 @@ The project currently includes:
 - dbt documentation and dashboard exposures
 - Metabase executive and operational dashboards
 - Dashboard screenshots for GitHub documentation
+- One-command local pipeline runner
+- Pipeline and stage-level observability tables
 
 Future production improvements include orchestration, deeper observability, and CI/CD.
 
@@ -559,13 +561,21 @@ Add Airflow or another orchestrator with:
 
 ### 4. Observability
 
-Add monitoring tables for:
+Implemented:
 
-- Pipeline run status
-- Stage durations
-- Row counts
-- Model freshness
-- Data quality summaries
+- Pipeline-level audit table: `monitoring.pipeline_run_audit`
+- Stage-level audit table: `monitoring.pipeline_stage_audit`
+- Run-level status tracking
+- Stage-level status tracking
+- Stage duration tracking
+- Error message capture for failed stages
+
+Planned improvements:
+
+- Row count snapshots by model
+- dbt model execution metrics
+- Data freshness checks
+- Alerting thresholds
 
 ### 5. Linting and code quality
 
