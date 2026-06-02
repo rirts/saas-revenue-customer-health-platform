@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    name: Build and test analytics pipeline
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: analytics
+          POSTGRES_PASSWORD: analytics_pwd
+          POSTGRES_DB: saas_platform
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U analytics -d saas_platform"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      POSTGRES_USER: analytics
+      POSTGRES_PASSWORD: analytics_pwd
+      POSTGRES_DB: saas_platform
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Verify PostgreSQL connection
+        run: |
+          python - <<'PY'
+          import os
+          import time
+          import psycopg2
+
+          connection_params = {
+              "host": os.environ["POSTGRES_HOST"],
+              "port": os.environ["POSTGRES_PORT"],
+              "dbname": os.environ["POSTGRES_DB"],
+              "user": os.environ["POSTGRES_USER"],
+              "password": os.environ["POSTGRES_PASSWORD"],
+          }
+
+          for attempt in range(10):
+              try:
+                  conn = psycopg2.connect(**connection_params)
+                  conn.close()
+                  print("PostgreSQL connection successful")
+                  break
+              except Exception as exc:
+                  print(f"Waiting for PostgreSQL... attempt={attempt + 1}, error={exc}")
+                  time.sleep(3)
+          else:
+              raise RuntimeError("Could not connect to PostgreSQL")
+          PY
+
+      - name: Generate synthetic source data
+        run: python scripts/generate_synthetic_data.py
+
+      - name: Load raw data into PostgreSQL
+        run: python scripts/load_raw_to_postgres.py
+
+      - name: Validate raw data quality
+        run: python scripts/validate_raw_data.py
+
+      - name: Install dbt dependencies
+        run: dbt deps --project-dir warehouse/dbt --profiles-dir warehouse/dbt
+
+      - name: Run dbt build
+        run: dbt build --project-dir warehouse/dbt --profiles-dir warehouse/dbt
