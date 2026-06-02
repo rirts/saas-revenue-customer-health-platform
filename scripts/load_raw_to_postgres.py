@@ -84,8 +84,16 @@ def load_table(engine: Engine, table_name: str, filename: str) -> int:
     return len(df)
 
 
-def create_load_audit_table(engine: Engine) -> None:
+def create_load_audit_table(engine):
     with engine.begin() as connection:
+        connection.execute(
+            text(
+                """
+                create schema if not exists monitoring;
+                """
+            )
+        )
+
         connection.execute(
             text(
                 """
