@@ -4,5 +4,6 @@ faker==25.8.0
 psycopg2-binary==2.9.9
 python-dotenv==1.0.1
 sqlalchemy==2.0.30
+dbt-core==1.11.11
 dbt-postgres==1.10.0
 PyMuPDF==1.27.2.3
