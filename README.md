@@ -42,6 +42,7 @@ The project currently includes:
 - One-command local pipeline runner
 - Pipeline and stage-level observability tables
 - GitHub Actions CI workflow for automated validation
+- Row-count observability across raw, staging, intermediate, and mart layers
 
 Future production improvements include orchestration, deeper observability, and CI/CD.
 
@@ -576,14 +577,16 @@ Implemented:
 
 - Pipeline-level audit table: `monitoring.pipeline_run_audit`
 - Stage-level audit table: `monitoring.pipeline_stage_audit`
+- Raw ingestion audit table: `monitoring.raw_load_audit`
+- Warehouse row-count audit table: `monitoring.table_row_count_audit`
 - Run-level status tracking
 - Stage-level status tracking
 - Stage duration tracking
 - Error message capture for failed stages
+- Row-count snapshots for raw, staging, intermediate, and mart relations
 
 Planned improvements:
 
-- Row count snapshots by model
 - dbt model execution metrics
 - Data freshness checks
 - Alerting thresholds

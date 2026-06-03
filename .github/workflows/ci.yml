@@ -91,3 +91,6 @@ jobs:
 
       - name: Run dbt build
         run: dbt build --project-dir warehouse/dbt --profiles-dir warehouse/dbt
+
+      - name: Collect warehouse row counts
+        run: python scripts/collect_table_row_counts.py

@@ -267,6 +267,10 @@ Invoke-CheckedCommand "Running dbt build" {
     dbt build --project-dir warehouse\dbt --profiles-dir warehouse\dbt
 }
 
+Invoke-CheckedCommand "Collecting warehouse row counts" {
+    python scripts\collect_table_row_counts.py --run-id $RunId
+}
+
 if (-not $SkipDocs) {
     Invoke-CheckedCommand "Generating dbt documentation" {
         dbt docs generate --project-dir warehouse\dbt --profiles-dir warehouse\dbt
