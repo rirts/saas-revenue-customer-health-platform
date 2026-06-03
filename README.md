@@ -304,6 +304,14 @@ Examples of business logic tests:
 
 These tests help ensure that the marts are not only technically valid, but also business-consistent.
 
+Additional data contract tests validate:
+
+- Customer health scores remain between 0 and 100.
+- Financial metrics such as current MRR, healthy MRR, non-healthy MRR, and MRR at risk are non-negative.
+- Account-level MRR components reconcile correctly.
+- Revenue retention, product adoption, and support operation rates remain between 0 and 1.
+- Churn risk priority ranks remain within valid operational priority bands.
+
 ---
 
 ## dbt Documentation & Exposures
