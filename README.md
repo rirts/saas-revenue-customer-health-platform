@@ -41,6 +41,7 @@ The project currently includes:
 - Dashboard screenshots for GitHub documentation
 - One-command local pipeline runner
 - Pipeline and stage-level observability tables
+- GitHub Actions CI workflow for automated validation
 
 Future production improvements include orchestration, deeper observability, and CI/CD.
 
@@ -58,13 +59,19 @@ Implemented:
 - PowerShell
 - Git / GitHub
 
+Implemented production-readiness features:
+
+- One-command local pipeline runner
+- Pipeline and stage-level observability tables
+- GitHub Actions CI workflow for automated pipeline validation
+- Pinned Python and dbt dependencies for reproducible builds
+
 Planned / next production-readiness improvements:
 
-- GitHub Actions CI/CD
-- One-command pipeline runner
 - Airflow or another orchestration layer
-- Extended pipeline observability and alerting
+- Extended row-count and freshness observability
 - Python and SQL linting
+- Alerting thresholds
 
 ---
 
@@ -539,15 +546,19 @@ to execute the full pipeline end-to-end.
 
 ### 2. CI/CD
 
-Add GitHub Actions to run:
+Implemented with GitHub Actions.
+
+The CI workflow runs on pushes and pull requests to `main` and validates:
 
 - Python dependency installation
-- Data generation
-- Raw loading
-- Raw validation
-- dbt deps
+- PostgreSQL service startup
+- Synthetic data generation
+- Raw data loading
+- Raw data validation
+- dbt dependency installation
 - dbt build
-- dbt tests
+
+This ensures the analytics pipeline is automatically tested outside the local development environment.
 
 ### 3. Orchestration
 
