@@ -61,6 +61,9 @@ Implemented:
 - PowerShell
 - Git / GitHub
 - GitHub Actions
+- Ruff
+- SQLFluff
+- Airflow
 
 Implemented production-readiness features:
 
@@ -525,9 +528,17 @@ saas-revenue-customer-health-platform/
 ├── .github/
 │   └── workflows/
 │       └── ci.yml
+├── dashboards/
+│   └── screenshots/
 ├── data/
 │   ├── raw/
 │   └── synthetic/
+├── docker/
+│   └── postgres/
+│       └── init/
+├── docs/
+├── monitoring/
+│   └── reports/
 ├── orchestration/
 │   └── airflow/
 │       ├── dags/
@@ -555,13 +566,15 @@ saas-revenue-customer-health-platform/
 │       ├── dbt_project.yml
 │       ├── packages.yml
 │       └── profiles.yml
-├── docker-compose.yml
-├── pyproject.toml
-├── requirements.txt
-├── README.md
-├── OPERATIONS_RUNBOOK.md
+├── .env.example
+├── .gitignore
 ├── .sqlfluff
-└── .gitignore
+├── docker-compose.yml
+├── Makefile
+├── OPERATIONS_RUNBOOK.md
+├── pyproject.toml
+├── README.md
+└── requirements.txt
 
 ```
 
