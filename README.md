@@ -45,7 +45,7 @@ The project currently includes:
 - Row-count observability across raw, staging, intermediate, and mart layers
 - Airflow DAG for production-style orchestration
 
-Future production improvements include orchestration, alerting, freshness checks, and linting/code quality automation.
+Future production improvements include full Airflow runtime support, alerting, freshness checks, SQL linting, and pre-commit automation.
 
 ---
 
@@ -68,12 +68,14 @@ Implemented production-readiness features:
 - Pipeline and stage-level observability tables
 - GitHub Actions CI workflow for automated pipeline validation
 - Pinned Python and dbt dependencies for reproducible builds
+- Python linting and formatting checks with Ruff
 
 Planned / next production-readiness improvements:
 
-- Airflow or another orchestration layer
-- Extended row-count and freshness observability
-- Python and SQL linting
+- Full local Airflow Docker runtime
+- Data freshness observability
+- SQL linting with SQLFluff
+- pre-commit hooks
 - Alerting thresholds
 
 ---
@@ -520,16 +522,28 @@ from marts.mart_account_360;
 
 ```text
 saas-revenue-customer-health-platform/
+├── .github/
+│   └── workflows/
+│       └── ci.yml
 ├── data/
 │   ├── raw/
 │   └── synthetic/
+├── orchestration/
+│   └── airflow/
+│       ├── dags/
+│       │   └── saas_platform_pipeline.py
+│       ├── logs/
+│       └── plugins/
 ├── reports/
 │   └── screenshots/
 ├── scripts/
+│   ├── collect_table_row_counts.py
+│   ├── convert_dashboard_pdfs_to_png.py
+│   ├── create_monitoring_tables.sql
 │   ├── generate_synthetic_data.py
 │   ├── load_raw_to_postgres.py
-│   ├── validate_raw_data.py
-│   └── convert_dashboard_pdfs_to_png.py
+│   ├── run_pipeline.ps1
+│   └── validate_raw_data.py
 ├── warehouse/
 │   └── dbt/
 │       ├── models/
@@ -542,6 +556,7 @@ saas-revenue-customer-health-platform/
 │       ├── packages.yml
 │       └── profiles.yml
 ├── docker-compose.yml
+├── pyproject.toml
 ├── requirements.txt
 ├── README.md
 ├── OPERATIONS_RUNBOOK.md
@@ -626,11 +641,16 @@ Planned improvements:
 
 ### 5. Linting and code quality
 
-Add tools such as:
+Implemented:
 
-- Ruff
-- SQLFluff
-- pre-commit
+- Ruff lint checks for Python scripts and Airflow DAGs
+- Ruff format checks for Python scripts and Airflow DAGs
+- Ruff validation in GitHub Actions CI
+
+Planned improvements:
+
+- SQLFluff for dbt SQL linting
+- pre-commit hooks for local automated checks
 
 ---
 
