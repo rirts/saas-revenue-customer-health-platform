@@ -99,6 +99,11 @@ jobs:
       - name: Install dbt dependencies
         run: dbt deps --project-dir warehouse/dbt --profiles-dir warehouse/dbt
 
+      - name: Run SQLFluff lint checks
+        run: |
+          sqlfluff lint warehouse/dbt/models
+          sqlfluff lint warehouse/dbt/tests
+
       - name: Run dbt build
         run: dbt build --project-dir warehouse/dbt --profiles-dir warehouse/dbt
 
