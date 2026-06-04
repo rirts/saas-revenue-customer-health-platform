@@ -45,7 +45,7 @@ The project currently includes:
 - Row-count observability across raw, staging, intermediate, and mart layers
 - Airflow DAG for production-style orchestration
 
-Future production improvements include full Airflow runtime support, alerting, freshness checks, SQL linting, and pre-commit automation.
+Future production improvements include full Airflow runtime support, alerting, freshness checks, and pre-commit automation.
 
 ---
 
@@ -69,12 +69,12 @@ Implemented production-readiness features:
 - GitHub Actions CI workflow for automated pipeline validation
 - Pinned Python and dbt dependencies for reproducible builds
 - Python linting and formatting checks with Ruff
+- SQL linting checks for dbt models and tests with SQLFluff
 
 Planned / next production-readiness improvements:
 
 - Full local Airflow Docker runtime
 - Data freshness observability
-- SQL linting with SQLFluff
 - pre-commit hooks
 - Alerting thresholds
 
@@ -560,6 +560,7 @@ saas-revenue-customer-health-platform/
 ├── requirements.txt
 ├── README.md
 ├── OPERATIONS_RUNBOOK.md
+├── .sqlfluff
 └── .gitignore
 
 ```
@@ -582,19 +583,17 @@ The script executes the pipeline end-to-end and records run-level and stage-leve
 
 ### 2. CI/CD
 
-Implemented with GitHub Actions.
-
 The CI workflow runs on pushes and pull requests to `main` and validates:
 
 - Python dependency installation
 - PostgreSQL service startup
+- Ruff linting and formatting checks
+- SQLFluff linting for dbt models and custom SQL tests
 - Synthetic data generation
 - Raw data loading
 - Raw data validation
 - dbt dependency installation
 - dbt build
-
-This ensures the analytics pipeline is automatically tested outside the local development environment.
 
 ### 3. Orchestration
 
@@ -646,10 +645,11 @@ Implemented:
 - Ruff lint checks for Python scripts and Airflow DAGs
 - Ruff format checks for Python scripts and Airflow DAGs
 - Ruff validation in GitHub Actions CI
+- SQLFluff lint checks for dbt models and custom SQL tests
+- SQLFluff validation in GitHub Actions CI
 
 Planned improvements:
 
-- SQLFluff for dbt SQL linting
 - pre-commit hooks for local automated checks
 
 ---
