@@ -43,6 +43,7 @@ The project currently includes:
 - Pipeline and stage-level observability tables
 - GitHub Actions CI workflow for automated validation
 - Row-count observability across raw, staging, intermediate, and mart layers
+- Airflow DAG for production-style orchestration
 
 Future production improvements include orchestration, alerting, freshness checks, and linting/code quality automation.
 
@@ -582,13 +583,26 @@ This ensures the analytics pipeline is automatically tested outside the local de
 
 ### 3. Orchestration
 
-Add Airflow or another orchestrator with:
+Implemented as an Airflow DAG under:
 
-- Retries
-- Backoff
-- Run-level logging
-- Stage-level observability
-- Failure handling
+```text
+orchestration/airflow/dags/saas_platform_pipeline.py
+```
+
+The DAG orchestrates:
+- Synthetic data generation
+- Raw data loading
+- Raw data validation
+- dbt dependency installation
+- dbt build
+- Warehouse row-count collection
+
+Planned improvements:
+
+- Full local Airflow Docker runtime
+- Airflow metadata database setup
+- Airflow UI documentation
+- Alerting on failed DAG runs
 
 ### 4. Observability
 
