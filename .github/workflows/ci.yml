@@ -49,6 +49,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Run Ruff lint checks
+        run: |
+          ruff check scripts
+          ruff check orchestration/airflow/dags
+
+      - name: Run Ruff format checks
+        run: |
+          ruff format scripts --check
+          ruff format orchestration/airflow/dags --check
+
       - name: Verify PostgreSQL connection
         run: |
           python - <<'PY'
