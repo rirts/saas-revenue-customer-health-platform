@@ -2,7 +2,6 @@ from pathlib import Path
 
 import fitz  # PyMuPDF
 
-
 SCREENSHOTS_DIR = Path("reports/screenshots")
 
 PDF_FILES = [
@@ -11,7 +10,9 @@ PDF_FILES = [
 ]
 
 
-def convert_first_page_to_png(pdf_path: Path, output_path: Path, zoom: float = 2.0) -> None:
+def convert_first_page_to_png(
+    pdf_path: Path, output_path: Path, zoom: float = 2.0
+) -> None:
     if not pdf_path.exists():
         raise FileNotFoundError(f"PDF not found: {pdf_path}")
 

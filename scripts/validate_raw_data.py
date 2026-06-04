@@ -8,7 +8,6 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.engine import Engine
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 RAW_SCHEMA = "raw"
 MONITORING_SCHEMA = "monitoring"
@@ -275,7 +274,9 @@ def validate_table_not_empty(engine: Engine) -> int:
     failed_checks = 0
 
     for table_name in EXPECTED_TABLES:
-        row_count = get_scalar(engine, f"select count(*) from {RAW_SCHEMA}.{table_name};")
+        row_count = get_scalar(
+            engine, f"select count(*) from {RAW_SCHEMA}.{table_name};"
+        )
         failed_records = 1 if row_count == 0 else 0
 
         write_result(
@@ -369,8 +370,8 @@ def validate_relationships(engine: Engine) -> int:
             check_type="relationship",
             failed_records=failed_records,
             details=(
-                f'{check["child_table"]}.{check["child_key"]} -> '
-                f'{check["parent_table"]}.{check["parent_key"]}'
+                f"{check['child_table']}.{check['child_key']} -> "
+                f"{check['parent_table']}.{check['parent_key']}"
             ),
         )
 
@@ -400,7 +401,7 @@ def validate_dates(engine: Engine) -> int:
             table_name=check["table_name"],
             check_type="date_not_null",
             failed_records=failed_records,
-            details=f'date_column={check["date_column"]}',
+            details=f"date_column={check['date_column']}",
         )
 
         if failed_records > 0:
@@ -428,7 +429,7 @@ def validate_non_negative_amounts(engine: Engine) -> int:
             table_name=check["table_name"],
             check_type="non_negative_amount",
             failed_records=failed_records,
-            details=f'amount_column={check["amount_column"]}',
+            details=f"amount_column={check['amount_column']}",
         )
 
         if failed_records > 0:
@@ -454,7 +455,9 @@ def main() -> None:
     if total_failed_checks == 0:
         print("All raw data validation checks passed.")
     else:
-        print(f"Raw data validation completed with {total_failed_checks} failed checks.")
+        print(
+            f"Raw data validation completed with {total_failed_checks} failed checks."
+        )
         raise SystemExit(1)
 
 

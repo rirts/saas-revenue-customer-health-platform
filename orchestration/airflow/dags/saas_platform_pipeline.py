@@ -7,7 +7,6 @@ from pathlib import Path
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 
-
 PROJECT_ROOT = Path(os.environ.get("PROJECT_ROOT", "/opt/airflow/project"))
 
 DEFAULT_ARGS = {

@@ -7,3 +7,4 @@ sqlalchemy==2.0.30
 dbt-core==1.11.11
 dbt-postgres==1.10.0
 PyMuPDF==1.27.2.3
+ruff==0.15.16

@@ -1,12 +1,11 @@
 import argparse
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
-
 
 PIPELINE_NAME = "saas_revenue_customer_health_platform"
 TARGET_SCHEMAS = ["raw", "staging", "intermediate", "marts"]
@@ -107,7 +106,9 @@ def count_relation_rows(engine: Engine, schema_name: str, relation_name: str) ->
     quoted_schema = quote_identifier(schema_name)
     quoted_relation = quote_identifier(relation_name)
 
-    query = text(f"select count(*) as row_count from {quoted_schema}.{quoted_relation};")
+    query = text(
+        f"select count(*) as row_count from {quoted_schema}.{quoted_relation};"
+    )
 
     with engine.begin() as connection:
         result = connection.execute(query).scalar_one()
@@ -166,7 +167,7 @@ def collect_table_row_counts(run_id: str | None) -> None:
     create_monitoring_table(engine)
 
     relations = get_relations(engine)
-    observed_at = datetime.now(timezone.utc)
+    observed_at = datetime.now(UTC)
 
     if not relations:
         print("No relations found for row-count collection.")
@@ -195,10 +196,7 @@ def collect_table_row_counts(run_id: str | None) -> None:
             observed_at=observed_at,
         )
 
-        print(
-            f"{schema_name}.{relation_name} "
-            f"({relation_type}) -> {row_count:,} rows"
-        )
+        print(f"{schema_name}.{relation_name} ({relation_type}) -> {row_count:,} rows")
 
     print(f"Row-count collection completed. Relations observed: {len(relations)}")
 
