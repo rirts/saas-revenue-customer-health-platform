@@ -44,7 +44,7 @@ The project currently includes:
 - GitHub Actions CI workflow for automated validation
 - Row-count observability across raw, staging, intermediate, and mart layers
 
-Future production improvements include orchestration, deeper observability, and CI/CD.
+Future production improvements include orchestration, alerting, freshness checks, and linting/code quality automation.
 
 ---
 
@@ -59,6 +59,7 @@ Implemented:
 - Metabase
 - PowerShell
 - Git / GitHub
+- GitHub Actions
 
 Implemented production-readiness features:
 
@@ -475,6 +476,14 @@ Use Metabase to inspect the dashboards and marts.
 
 ---
 
+## Operations Runbook
+
+For operational guidance, troubleshooting steps, monitoring queries, and validation procedures, see:
+
+- [`OPERATIONS_RUNBOOK.md`](OPERATIONS_RUNBOOK.md): operational guide for running, validating, monitoring, and troubleshooting the platform.
+
+---
+
 ## Useful Validation Queries
 
 ### Account 360 row count
@@ -534,7 +543,9 @@ saas-revenue-customer-health-platform/
 ├── docker-compose.yml
 ├── requirements.txt
 ├── README.md
+├── OPERATIONS_RUNBOOK.md
 └── .gitignore
+
 ```
 
 ---
@@ -545,13 +556,13 @@ The project already includes a strong analytics engineering foundation. The next
 
 ### 1. One-command pipeline execution
 
-Add a script such as:
+Implemented with:
 
 ```powershell
 .\scripts\run_pipeline.ps1
 ```
 
-to execute the full pipeline end-to-end.
+The script executes the pipeline end-to-end and records run-level and stage-level audit metadata.
 
 ### 2. CI/CD
 
