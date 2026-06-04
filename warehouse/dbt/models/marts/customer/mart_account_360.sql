@@ -88,7 +88,7 @@ final as (
             else 'unknown'
         end as revenue_tier,
 
-		case
+        case
             when not is_current_customer and account_lifecycle_stage = 'churned_customer'
                 then 'Churned - winback review'
             when not is_current_customer

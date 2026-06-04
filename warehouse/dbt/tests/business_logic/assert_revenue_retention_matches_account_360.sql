@@ -40,6 +40,7 @@ validation as (
 
 select *
 from validation
-where account_360_current_mrr_usd <> revenue_retention_current_mrr_usd
-   or account_360_mrr_at_risk_usd <> revenue_retention_mrr_at_risk_usd
-   or account_360_customer_count <> revenue_retention_customer_count
+where
+    account_360_current_mrr_usd <> revenue_retention_current_mrr_usd
+    or account_360_mrr_at_risk_usd <> revenue_retention_mrr_at_risk_usd
+    or account_360_customer_count <> revenue_retention_customer_count

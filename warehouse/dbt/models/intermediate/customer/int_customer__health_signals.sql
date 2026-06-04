@@ -108,7 +108,8 @@ signals as (
         coalesce(support_summary.has_critical_ticket, false) as has_critical_ticket,
 
         case
-            when coalesce(subscription_aggregated.current_mrr_usd, 0) > 0
+            when
+                coalesce(subscription_aggregated.current_mrr_usd, 0) > 0
                 or coalesce(subscription_aggregated.active_subscription_count, 0) > 0
                 or coalesce(subscription_aggregated.past_due_subscription_count, 0) > 0
                 then true
@@ -131,7 +132,8 @@ risk_flags as (
         *,
 
         case
-            when is_current_customer
+            when
+                is_current_customer
                 and usage_intensity in ('no_usage', 'low_usage')
                 then true
             else false
@@ -229,7 +231,8 @@ risk_adjusted as (
         *,
 
         case
-            when not is_current_customer
+            when
+                not is_current_customer
                 and account_lifecycle_stage in ('prospect', 'won_not_subscribed')
                 then raw_customer_health_score
 
@@ -255,7 +258,8 @@ segmented as (
         *,
 
         case
-            when not is_current_customer
+            when
+                not is_current_customer
                 and account_lifecycle_stage in ('prospect', 'won_not_subscribed')
                 then 'not_customer'
 
@@ -275,7 +279,8 @@ segmented as (
         end as customer_health_segment,
 
         case
-            when not is_current_customer
+            when
+                not is_current_customer
                 and account_lifecycle_stage in ('prospect', 'won_not_subscribed')
                 then false
 

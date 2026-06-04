@@ -1,0 +1,27 @@
+[sqlfluff]
+dialect = postgres
+templater = dbt
+exclude_rules = layout.long_lines, structure.column_order, structure.simple_case, structure.else_null
+max_line_length = 120
+large_file_skip_byte_limit = 0
+
+[sqlfluff:templater:dbt]
+project_dir = warehouse/dbt
+profiles_dir = warehouse/dbt
+profile = saas_revenue_customer_health_platform
+target = dev
+
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.identifiers]
+extended_capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.functions]
+capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.literals]
+capitalisation_policy = lower
+
+[sqlfluff:rules:ambiguous.column_references]
+group_by_and_order_by_style = explicit

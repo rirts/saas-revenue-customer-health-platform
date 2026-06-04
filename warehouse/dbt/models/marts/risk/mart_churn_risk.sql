@@ -74,7 +74,7 @@ final as (
             else 'general_risk'
         end as primary_risk_reason,
 
-		case
+        case
             when account_lifecycle_stage = 'churned_customer'
                 then 'closed_loss_or_churn_review'
             when has_overdue_invoice
@@ -90,7 +90,7 @@ final as (
             else 'manual_review'
         end as recommended_risk_playbook,
 
-		case
+        case
             when not is_current_customer and account_lifecycle_stage = 'churned_customer' then 'P5'
             when customer_health_segment = 'critical' and current_mrr_usd >= 5000 then 'P1'
             when customer_health_segment = 'critical' then 'P2'

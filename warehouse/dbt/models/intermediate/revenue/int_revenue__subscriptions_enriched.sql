@@ -5,13 +5,6 @@ with subscriptions as (
 
 ),
 
-customers as (
-
-    select *
-    from {{ ref('stg_billing__customers') }}
-
-),
-
 accounts as (
 
     select *
@@ -110,8 +103,6 @@ final as (
         end as has_overdue_invoice
 
     from subscriptions
-    left join customers
-        on subscriptions.billing_customer_id = customers.billing_customer_id
     left join accounts
         on subscriptions.account_id = accounts.account_id
     left join invoice_aggregated

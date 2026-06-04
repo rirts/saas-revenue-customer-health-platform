@@ -7,7 +7,8 @@ select
     customer_risk_rate,
     mrr_at_risk_rate
 from {{ ref('mart_revenue_retention') }}
-where customer_risk_rate < 0
-   or customer_risk_rate > 1
-   or mrr_at_risk_rate < 0
-   or mrr_at_risk_rate > 1
+where
+    customer_risk_rate < 0
+    or customer_risk_rate > 1
+    or mrr_at_risk_rate < 0
+    or mrr_at_risk_rate > 1
