@@ -6,7 +6,7 @@ from typing import Any
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, inspect, text
-from sqlalchemy.engine import Engine
+from sqlalchemy.engine import URL, Engine
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 RAW_SCHEMA = "raw"
@@ -161,9 +161,17 @@ def get_database_url() -> str:
     user = os.getenv("POSTGRES_USER", "analytics")
     password = os.getenv("POSTGRES_PASSWORD", "analytics_pwd")
     database = os.getenv("POSTGRES_DB", "saas_platform")
-    port = os.getenv("POSTGRES_LOCAL_PORT", "5432")
+    port = os.getenv("POSTGRES_LOCAL_PORT", os.getenv("POSTGRES_PORT", "5432"))
 
-    return f"postgresql+psycopg2://{user}:{password}@localhost:{port}/{database}"
+    host = os.getenv("POSTGRES_HOST", "localhost")
+    return URL.create(
+        "postgresql+psycopg2",
+        username=user,
+        password=password,
+        host=host,
+        port=int(port),
+        database=database,
+    ).render_as_string(hide_password=False)
 
 
 def create_db_engine() -> Engine:

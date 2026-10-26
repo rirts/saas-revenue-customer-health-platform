@@ -3,10 +3,10 @@ saas_revenue_customer_health_platform:
   outputs:
     dev:
       type: postgres
-      host: localhost
-      user: analytics
-      password: analytics_pwd
-      port: 5432
-      dbname: saas_platform
+      host: "{{ env_var('POSTGRES_HOST', 'localhost') }}"
+      user: "{{ env_var('POSTGRES_USER', 'analytics') }}"
+      password: "{{ env_var('POSTGRES_PASSWORD', 'analytics_pwd') }}"
+      port: "{{ env_var('POSTGRES_LOCAL_PORT', env_var('POSTGRES_PORT', '5432')) | int }}"
+      dbname: "{{ env_var('POSTGRES_DB', 'saas_platform') }}"
       schema: analytics
       threads: 4

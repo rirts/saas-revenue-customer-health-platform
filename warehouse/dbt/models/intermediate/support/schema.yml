@@ -30,7 +30,7 @@ models:
           - not_null
 
       - name: high_priority_tickets
-        description: Tickets with high or critical severity.
+        description: Open or pending tickets with high or critical severity.
         tests:
           - not_null
 
@@ -48,6 +48,6 @@ models:
           - not_null
 
       - name: has_critical_ticket
-        description: Boolean flag indicating whether the account has at least one critical ticket.
+        description: Boolean flag indicating whether the account has at least one open or pending critical ticket as of the observation date.
         tests:
           - not_null

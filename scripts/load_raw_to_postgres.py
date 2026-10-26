@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pandas as pd
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, text
-from sqlalchemy.engine import Engine
+from sqlalchemy import create_engine, inspect, text
+from sqlalchemy.engine import URL, Connection, Engine
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = PROJECT_ROOT / "data" / "generated"
@@ -32,12 +32,17 @@ def get_database_url() -> str:
     user = os.getenv("POSTGRES_USER", "analytics")
     password = os.getenv("POSTGRES_PASSWORD", "analytics_pwd")
     database = os.getenv("POSTGRES_DB", "saas_platform")
-    port = os.getenv("POSTGRES_LOCAL_PORT", "5432")
+    port = os.getenv("POSTGRES_LOCAL_PORT", os.getenv("POSTGRES_PORT", "5432"))
 
-    # This script runs from the host machine, so localhost is correct here.
-    host = "localhost"
-
-    return f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}"
+    host = os.getenv("POSTGRES_HOST", "localhost")
+    return URL.create(
+        "postgresql+psycopg2",
+        username=user,
+        password=password,
+        host=host,
+        port=int(port),
+        database=database,
+    ).render_as_string(hide_password=False)
 
 
 def create_db_engine() -> Engine:
@@ -66,20 +71,25 @@ def validate_input_files() -> None:
         )
 
 
-def load_table(engine: Engine, table_name: str, filename: str) -> int:
-    path = DATA_DIR / filename
-    df = pd.read_csv(path)
+def load_table(connection: Connection, table_name: str, filename: str) -> int:
+    """Replace rows without dropping the relation or its dependent views.
 
+    The caller owns the transaction so all source tables publish atomically.
+    """
+    if table_name not in TABLE_FILES:
+        raise ValueError(f"Unknown raw table: {table_name}")
+    df = pd.read_csv(DATA_DIR / filename)
+    if inspect(connection).has_table(table_name, schema=RAW_SCHEMA):
+        connection.execute(text(f'DELETE FROM "{RAW_SCHEMA}"."{table_name}"'))
     df.to_sql(
         name=table_name,
-        con=engine,
+        con=connection,
         schema=RAW_SCHEMA,
-        if_exists="replace",
+        if_exists="append",
         index=False,
         method="multi",
         chunksize=5_000,
     )
-
     return len(df)
 
 
@@ -108,29 +118,14 @@ def create_load_audit_table(engine):
         )
 
 
-def write_load_audit(engine: Engine, table_name: str, row_count: int) -> None:
-    with engine.begin() as connection:
-        connection.execute(
-            text(
-                """
-                insert into monitoring.raw_load_audit (
-                    table_schema,
-                    table_name,
-                    row_count
-                )
-                values (
-                    :table_schema,
-                    :table_name,
-                    :row_count
-                );
-                """
-            ),
-            {
-                "table_schema": RAW_SCHEMA,
-                "table_name": table_name,
-                "row_count": row_count,
-            },
-        )
+def write_load_audit(connection: Connection, table_name: str, row_count: int) -> None:
+    connection.execute(
+        text("""
+            insert into monitoring.raw_load_audit (table_schema, table_name, row_count)
+            values (:table_schema, :table_name, :row_count)
+        """),
+        {"table_schema": RAW_SCHEMA, "table_name": table_name, "row_count": row_count},
+    )
 
 
 def main() -> None:
@@ -142,11 +137,13 @@ def main() -> None:
 
     print("Loading generated CSV files into PostgreSQL raw schema...\n")
 
-    for table_name, filename in TABLE_FILES.items():
-        row_count = load_table(engine, table_name, filename)
-        write_load_audit(engine, table_name, row_count)
-        print(f"Loaded raw.{table_name}: {row_count:,} rows")
+    with engine.begin() as connection:
+        for table_name, filename in TABLE_FILES.items():
+            row_count = load_table(connection, table_name, filename)
+            write_load_audit(connection, table_name, row_count)
+            print(f"Loaded raw.{table_name}: {row_count:,} rows")
 
+    engine.dispose()
     print("\nRaw data load completed.")
 
 
