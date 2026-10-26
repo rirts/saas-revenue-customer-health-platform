@@ -21,6 +21,7 @@ payments_aggregated as (
         min(payment_date) as first_payment_date,
         max(payment_date) as latest_payment_date
     from payments
+    where payment_date <= '{{ var('as_of_date') }}'::date
     group by invoice_id
 
 ),
@@ -36,8 +37,8 @@ final as (
         invoices.due_date,
         invoices.amount_due_usd,
         invoices.invoice_status,
-        invoices.is_paid,
-        invoices.is_open,
+        coalesce(payments_aggregated.total_paid_usd, 0) >= invoices.amount_due_usd as is_paid,
+        coalesce(payments_aggregated.total_paid_usd, 0) < invoices.amount_due_usd as is_open,
 
         coalesce(payments_aggregated.payment_count, 0) as payment_count,
         coalesce(payments_aggregated.total_paid_usd, 0)::numeric(18, 2) as total_paid_usd,
@@ -58,7 +59,9 @@ final as (
         end as days_to_payment,
 
         case
-            when invoices.is_open and invoices.due_date < current_date then true
+            when
+                coalesce(payments_aggregated.total_paid_usd, 0) < invoices.amount_due_usd
+                and invoices.due_date < '{{ var('as_of_date') }}'::date then true
             else false
         end as is_overdue
 

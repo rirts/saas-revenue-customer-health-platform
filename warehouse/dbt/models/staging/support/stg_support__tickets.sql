@@ -20,12 +20,19 @@ renamed as (
         category::text as category,
 
         case
-            when status in ('resolved', 'closed') then true
+            when
+                status in ('resolved', 'closed')
+                and nullif(resolved_at::text, '')::date <= '{{ var('as_of_date') }}'::date then true
             else false
         end as is_resolved,
 
         case
-            when status in ('open', 'pending') then true
+            when
+                created_at::date <= '{{ var('as_of_date') }}'::date
+                and (
+                    status in ('open', 'pending')
+                    or nullif(resolved_at::text, '')::date > '{{ var('as_of_date') }}'::date
+                ) then true
             else false
         end as is_open,
 

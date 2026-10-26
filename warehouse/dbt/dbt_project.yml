@@ -24,3 +24,7 @@ models:
     marts:
       +schema: marts
       +materialized: table
+vars:
+  # Fixed observation date for the bundled synthetic dataset; override for live data.
+  as_of_date: '2025-12-31'
+  usage_window_days: 90

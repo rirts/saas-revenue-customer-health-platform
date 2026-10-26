@@ -5,7 +5,7 @@ from typing import Any
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
-from sqlalchemy.engine import Engine
+from sqlalchemy.engine import URL, Engine
 
 PIPELINE_NAME = "saas_revenue_customer_health_platform"
 TARGET_SCHEMAS = ["raw", "staging", "intermediate", "marts"]
@@ -17,15 +17,17 @@ def get_database_url() -> str:
     user = os.getenv("POSTGRES_USER", "analytics")
     password = os.getenv("POSTGRES_PASSWORD", "analytics_pwd")
     host = os.getenv("POSTGRES_HOST", "localhost")
-    port = os.getenv("POSTGRES_PORT", "5432")
+    port = os.getenv("POSTGRES_LOCAL_PORT", os.getenv("POSTGRES_PORT", "5432"))
     database = os.getenv("POSTGRES_DB", "saas_platform")
 
-    # In Docker Compose, the PostgreSQL service is reachable as "postgres".
-    # When this script runs from the local host machine, it must use "localhost".
-    if host == "postgres":
-        host = "localhost"
-
-    return f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}"
+    return URL.create(
+        "postgresql+psycopg2",
+        username=user,
+        password=password,
+        host=host,
+        port=int(port),
+        database=database,
+    ).render_as_string(hide_password=False)
 
 
 def create_monitoring_table(engine: Engine) -> None:

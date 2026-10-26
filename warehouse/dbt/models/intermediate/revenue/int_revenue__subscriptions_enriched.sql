@@ -94,7 +94,7 @@ final as (
         case
             when subscriptions.canceled_at is not null
                 then subscriptions.canceled_at - subscriptions.start_date
-            else current_date - subscriptions.start_date
+            else '{{ var('as_of_date') }}'::date - subscriptions.start_date
         end as subscription_age_days,
 
         case

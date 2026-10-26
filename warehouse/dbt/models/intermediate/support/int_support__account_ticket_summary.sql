@@ -13,9 +13,9 @@ ticket_aggregated as (
         count(*) as total_tickets,
         count(*) filter (where is_open) as open_tickets,
         count(*) filter (where is_resolved) as resolved_tickets,
-        count(*) filter (where is_high_priority) as high_priority_tickets,
+        count(*) filter (where is_high_priority and is_open) as high_priority_tickets,
 
-        count(*) filter (where severity = 'critical') as critical_tickets,
+        count(*) filter (where severity = 'critical' and is_open) as critical_tickets,
         count(*) filter (where severity = 'high') as high_tickets,
         count(*) filter (where severity = 'medium') as medium_tickets,
         count(*) filter (where severity = 'low') as low_tickets,
@@ -26,6 +26,7 @@ ticket_aggregated as (
         round(avg(resolution_days)::numeric, 2) as avg_resolution_days
 
     from tickets
+    where created_date <= '{{ var('as_of_date') }}'::date
     group by account_id
 
 ),

@@ -2,7 +2,7 @@ version: 2
 
 sources:
   - name: raw
-    database: saas_platform
+    database: "{{ target.database }}"
     schema: raw
     description: Raw source tables loaded from generated CSV files into PostgreSQL.
     tables:

@@ -26,6 +26,9 @@ usage_aggregated as (
         count(distinct event_type) as adopted_feature_count
 
     from events
+    where
+        event_date between '{{ var('as_of_date') }}'::date - ({{ var('usage_window_days') }} - 1)
+        and '{{ var('as_of_date') }}'::date
     group by account_id
 
 ),
